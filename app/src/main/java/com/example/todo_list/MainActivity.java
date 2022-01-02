@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,7 +14,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amplifyframework.AmplifyException;
+import com.amplifyframework.api.aws.AWSApiPlugin;
+import com.amplifyframework.core.Amplify;
+import com.amplifyframework.core.model.query.Where;
+import com.amplifyframework.core.model.temporal.Temporal;
+import com.amplifyframework.datastore.AWSDataStorePlugin;
+import com.amplifyframework.datastore.generated.model.Priority;
+import com.amplifyframework.datastore.generated.model.Todo;
+
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,6 +38,28 @@ public class MainActivity extends AppCompatActivity {
     public int completed = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        try {
+            Amplify.addPlugin(new AWSApiPlugin());
+            Amplify.addPlugin(new AWSDataStorePlugin());
+            Amplify.configure(getApplicationContext());
+            Log.i("Tutorial", "Initialized Amplify");
+        } catch (AmplifyException failure) {
+            Log.e("Tutorial", "Could not initialize Amplify", failure);
+        }
+        Todo item = Todo.builder()
+                .name("Spiderman")
+                .priority(Priority.NORMAL)
+                .build();
+        Amplify.DataStore.save(item,
+                success -> Log.i("Tutorial", "Saved item: " + success.item().getName()),
+                error -> Log.e("Tutorial", "Could not save item to DataStore", error)
+        );
+        Amplify.DataStore.observe(Todo.class,
+                started -> Log.i("Tutorial", "Observation began."),
+                change -> Log.i("Tutorial", change.item().toString()),
+                failure -> Log.e("Tutorial", "Observation failed.", failure),
+                () -> Log.i("Tutorial", "Observation complete.")
+        );
         if(this.getSupportActionBar()!=null)
             this.getSupportActionBar().hide();
 
