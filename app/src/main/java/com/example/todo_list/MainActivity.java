@@ -16,6 +16,10 @@ import android.widget.Toast;
 
 import com.amplifyframework.AmplifyException;
 import com.amplifyframework.api.aws.AWSApiPlugin;
+import com.amplifyframework.api.graphql.GraphQLRequest;
+import com.amplifyframework.api.graphql.PaginatedResult;
+import com.amplifyframework.api.graphql.model.ModelPagination;
+import com.amplifyframework.api.graphql.model.ModelQuery;
 import com.amplifyframework.core.Amplify;
 import com.amplifyframework.core.model.query.Where;
 import com.amplifyframework.core.model.temporal.Temporal;
@@ -46,20 +50,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (AmplifyException failure) {
             Log.e("Tutorial", "Could not initialize Amplify", failure);
         }
-        Todo item = Todo.builder()
-                .name("Spiderman")
-                .priority(Priority.NORMAL)
-                .build();
-        Amplify.DataStore.save(item,
-                success -> Log.i("Tutorial", "Saved item: " + success.item().getName()),
-                error -> Log.e("Tutorial", "Could not save item to DataStore", error)
-        );
-        Amplify.DataStore.observe(Todo.class,
-                started -> Log.i("Tutorial", "Observation began."),
-                change -> Log.i("Tutorial", change.item().toString()),
-                failure -> Log.e("Tutorial", "Observation failed.", failure),
-                () -> Log.i("Tutorial", "Observation complete.")
-        );
+
+        
+
         if(this.getSupportActionBar()!=null)
             this.getSupportActionBar().hide();
 
@@ -81,6 +74,39 @@ public class MainActivity extends AppCompatActivity {
         itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         todoListView.setAdapter(itemsAdapter);
         setUpListViewListener();
+
+        Amplify.DataStore.query(Todo.class,
+                todos -> {
+                    while (todos.hasNext()) {
+                        Todo todo = todos.next();
+
+                        Log.i("Tutorial", "==== Todo ====");
+                        String name = todo.getName();
+                        Log.i("Tutorial", "Name: " + name);
+                        items.add(name);
+                        itemsAdapter.notifyDataSetChanged();
+                        if (todo.getPriority() != null) {
+                            Log.i("Tutorial", "Priority: " + todo.getPriority().toString());
+                        }
+
+                        if (todo.getCompletedAt() != null) {
+                            Log.i("Tutorial", "CompletedAt: " + todo.getCompletedAt().toString());
+                        }
+                    }
+                },
+                failure -> Log.e("Tutorial", "Could not query DataStore", failure)
+        );
+
+        Amplify.DataStore.observe(Todo.class,
+                started -> Log.i("Tutorial", "Observation began."),
+                change -> Log.i("Tutorial", change.item().toString()),
+                failure -> Log.e("Tutorial", "Observation failed.", failure),
+                () -> Log.i("Tutorial", "Observation complete.")
+        );
+    }
+
+    private void populateList() {
+
     }
 
     private void setUpListViewListener() {
@@ -101,18 +127,48 @@ public class MainActivity extends AppCompatActivity {
     private void addItem(View view) {
         EditText input = findViewById(R.id.inputItem);
         String inputString = input.getText().toString();
+
+        Todo item = Todo.builder()
+                .name(inputString)
+                .priority(Priority.NORMAL)
+                .build();
+        Amplify.DataStore.save(item,
+                success -> Log.i("Tutorial", "Saved item: " + success.item().getName()),
+                error -> Log.e("Tutorial", "Could not save item to DataStore", error)
+        );
+
         if (!(inputString.equals(""))) {
             items.add(inputString);
             input.setText("");
             itemsAdapter.notifyDataSetChanged();
         }else{
             Context context = getApplicationContext();
-            Toast.makeText(context, items.get(0), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Please Type Text", Toast.LENGTH_LONG).show();
         }
     }
 
     private void updateCompletedText(){
         String completedString = "Completed: " + completed;
         completedText.setText(completedString);
+    }
+    public void queryFirstPage() {
+        query(ModelQuery.list(Todo.class, ModelPagination.limit(1_000)));
+    }
+
+    private static void query(GraphQLRequest<PaginatedResult<Todo>> request) {
+        Amplify.API.query(
+                request,
+                response -> {
+                    if (response.hasData()) {
+                        for (Todo todo : response.getData()) {
+                            Log.d("MyAmplifyApp", todo.getName());
+                        }
+                        if (response.getData().hasNextResult()) {
+                            query(response.getData().getRequestForNextResult());
+                        }
+                    }
+                },
+                failure -> Log.e("MyAmplifyApp", "Query failed.", failure)
+        );
     }
 }
