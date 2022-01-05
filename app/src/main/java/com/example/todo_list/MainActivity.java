@@ -18,23 +18,23 @@ import com.amplifyframework.AmplifyException;
 import com.amplifyframework.api.aws.AWSApiPlugin;
 import com.amplifyframework.api.graphql.GraphQLRequest;
 import com.amplifyframework.api.graphql.PaginatedResult;
-import com.amplifyframework.api.graphql.model.ModelPagination;
-import com.amplifyframework.api.graphql.model.ModelQuery;
+import com.amplifyframework.api.graphql.model.ModelMutation;
 import com.amplifyframework.core.Amplify;
-import com.amplifyframework.core.model.query.Where;
 import com.amplifyframework.core.model.temporal.Temporal;
 import com.amplifyframework.datastore.AWSDataStorePlugin;
-import com.amplifyframework.datastore.generated.model.Priority;
 import com.amplifyframework.datastore.generated.model.Todo;
+import com.google.type.DateTime;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<String> items;
+    private ArrayList<Todo> todoItems;
+    private ArrayList<String> itemNames;
     private ArrayAdapter<String> itemsAdapter;
     private Button addItemButton;
     private ListView todoListView;
@@ -50,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (AmplifyException failure) {
             Log.e("Tutorial", "Could not initialize Amplify", failure);
         }
-
-        
 
         if(this.getSupportActionBar()!=null)
             this.getSupportActionBar().hide();
@@ -69,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
                 addItem(v);
             }
         });
-
-        items = new ArrayList<>();
-        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
+        itemNames = new ArrayList<>();
+        todoItems = new ArrayList<>();
+        itemsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, itemNames);
         todoListView.setAdapter(itemsAdapter);
         setUpListViewListener();
 
@@ -81,13 +79,18 @@ public class MainActivity extends AppCompatActivity {
                         Todo todo = todos.next();
 
                         Log.i("Tutorial", "==== Todo ====");
-                        String name = todo.getName();
-                        Log.i("Tutorial", "Name: " + name);
-                        items.add(name);
-                        itemsAdapter.notifyDataSetChanged();
+                        if (todo.getCompleted() == null) {
+                            todoItems.add(todo);
+                            String name = todo.getName();
+                            itemNames.add(name);
+                            itemsAdapter.notifyDataSetChanged();
+                        }
 
-                        if (todo.getCompletedAt() != null) {
-                            Log.i("Tutorial", "CompletedAt: " + todo.getCompletedAt().toString());
+                        Log.i("Tutorial", "Name: " + todo.getName());
+
+
+                        if (todo.getCompleted() != null) {
+                            Log.i("Tutorial", "CompletedAt: " + todo.getCompleted().toString());
                         }
                     }
                 },
@@ -112,7 +115,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Context context = getApplicationContext();
                 Toast.makeText(context, "Task Deleted", Toast.LENGTH_LONG).show();
-                items.remove(position);
+                Todo curr = todoItems.get(position);
+
+                Date date = new Date();
+                int offsetMillis = TimeZone.getDefault().getOffset(date.getTime());
+                int offsetSeconds = (int) TimeUnit.MILLISECONDS.toSeconds(offsetMillis);
+                Temporal.DateTime temporalDateTime = new Temporal.DateTime(date, offsetSeconds);
+                Todo update = curr.copyOfBuilder().completed("Completed").build();
+                Amplify.DataStore.delete(curr,
+                        updated -> Log.i("Tutorial", "Updated AWS Database"),
+                        failure -> Log.i("Tutorial", "Failed to Update"));
+                Log.i("Test", curr.getId());
                 itemsAdapter.notifyDataSetChanged();
                 completed++;
                 updateCompletedText();
@@ -134,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         if (!(inputString.equals(""))) {
-            items.add(inputString);
+            itemNames.add(inputString);
             input.setText("");
             itemsAdapter.notifyDataSetChanged();
         }else{

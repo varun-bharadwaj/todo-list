@@ -1,3 +1,5 @@
+// Generated using amplify-cli-version: 7.6.5, amplify-codegen-version: 2.26.21
+
 package com.amplifyframework.datastore.generated.model;
 
 import com.amplifyframework.core.model.temporal.Temporal;
@@ -27,10 +29,10 @@ import static com.amplifyframework.core.model.query.predicate.QueryField.field;
 public final class Todo implements Model {
   public static final QueryField ID = field("Todo", "id");
   public static final QueryField NAME = field("Todo", "name");
-  public static final QueryField COMPLETED_AT = field("Todo", "completedAt");
+  public static final QueryField COMPLETED = field("Todo", "completed");
   private final @ModelField(targetType="ID", isRequired = true) String id;
   private final @ModelField(targetType="String", isRequired = true) String name;
-  private final @ModelField(targetType="String") String completedAt;
+  private final @ModelField(targetType="String") String completed;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   public String getId() {
@@ -41,8 +43,8 @@ public final class Todo implements Model {
       return name;
   }
   
-  public String getCompletedAt() {
-      return completedAt;
+  public String getCompleted() {
+      return completed;
   }
   
   public Temporal.DateTime getCreatedAt() {
@@ -53,10 +55,10 @@ public final class Todo implements Model {
       return updatedAt;
   }
   
-  private Todo(String id, String name, String completedAt) {
+  private Todo(String id, String name, String completed) {
     this.id = id;
     this.name = name;
-    this.completedAt = completedAt;
+    this.completed = completed;
   }
   
   @Override
@@ -69,7 +71,7 @@ public final class Todo implements Model {
       Todo todo = (Todo) obj;
       return ObjectsCompat.equals(getId(), todo.getId()) &&
               ObjectsCompat.equals(getName(), todo.getName()) &&
-              ObjectsCompat.equals(getCompletedAt(), todo.getCompletedAt()) &&
+              ObjectsCompat.equals(getCompleted(), todo.getCompleted()) &&
               ObjectsCompat.equals(getCreatedAt(), todo.getCreatedAt()) &&
               ObjectsCompat.equals(getUpdatedAt(), todo.getUpdatedAt());
       }
@@ -80,7 +82,7 @@ public final class Todo implements Model {
     return new StringBuilder()
       .append(getId())
       .append(getName())
-      .append(getCompletedAt())
+      .append(getCompleted())
       .append(getCreatedAt())
       .append(getUpdatedAt())
       .toString()
@@ -93,7 +95,7 @@ public final class Todo implements Model {
       .append("Todo {")
       .append("id=" + String.valueOf(getId()) + ", ")
       .append("name=" + String.valueOf(getName()) + ", ")
-      .append("completedAt=" + String.valueOf(getCompletedAt()) + ", ")
+      .append("completed=" + String.valueOf(getCompleted()) + ", ")
       .append("createdAt=" + String.valueOf(getCreatedAt()) + ", ")
       .append("updatedAt=" + String.valueOf(getUpdatedAt()))
       .append("}")
@@ -123,7 +125,7 @@ public final class Todo implements Model {
   public CopyOfBuilder copyOfBuilder() {
     return new CopyOfBuilder(id,
       name,
-      completedAt);
+      completed);
   }
   public interface NameStep {
     BuildStep name(String name);
@@ -133,14 +135,14 @@ public final class Todo implements Model {
   public interface BuildStep {
     Todo build();
     BuildStep id(String id);
-    BuildStep completedAt(String completedAt);
+    BuildStep completed(String completed);
   }
   
 
   public static class Builder implements NameStep, BuildStep {
     private String id;
     private String name;
-    private String completedAt;
+    private String completed;
     @Override
      public Todo build() {
         String id = this.id != null ? this.id : UUID.randomUUID().toString();
@@ -148,7 +150,7 @@ public final class Todo implements Model {
         return new Todo(
           id,
           name,
-          completedAt);
+          completed);
     }
     
     @Override
@@ -159,8 +161,8 @@ public final class Todo implements Model {
     }
     
     @Override
-     public BuildStep completedAt(String completedAt) {
-        this.completedAt = completedAt;
+     public BuildStep completed(String completed) {
+        this.completed = completed;
         return this;
     }
     
@@ -176,10 +178,10 @@ public final class Todo implements Model {
   
 
   public final class CopyOfBuilder extends Builder {
-    private CopyOfBuilder(String id, String name, String completedAt) {
+    private CopyOfBuilder(String id, String name, String completed) {
       super.id(id);
       super.name(name)
-        .completedAt(completedAt);
+        .completed(completed);
     }
     
     @Override
@@ -188,8 +190,8 @@ public final class Todo implements Model {
     }
     
     @Override
-     public CopyOfBuilder completedAt(String completedAt) {
-      return (CopyOfBuilder) super.completedAt(completedAt);
+     public CopyOfBuilder completed(String completed) {
+      return (CopyOfBuilder) super.completed(completed);
     }
   }
   

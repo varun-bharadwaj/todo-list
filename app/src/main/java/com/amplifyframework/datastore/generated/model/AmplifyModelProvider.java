@@ -1,3 +1,5 @@
+// Generated using amplify-cli-version: 7.6.5, amplify-codegen-version: 2.26.21
+
 package com.amplifyframework.datastore.generated.model;
 
 import com.amplifyframework.util.Immutable;
@@ -13,7 +15,7 @@ import java.util.Set;
  */
 
 public final class AmplifyModelProvider implements ModelProvider {
-  private static final String AMPLIFY_MODEL_VERSION = "d8f2d44fa4513ac7f49913739adaf2cb";
+  private static final String AMPLIFY_MODEL_VERSION = "54c405e244e04fc3cb43f0dc7f3e4e6e";
   private static AmplifyModelProvider amplifyGeneratedModelInstance;
   private AmplifyModelProvider() {
     
