@@ -85,9 +85,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("Tutorial", "Name: " + name);
                         items.add(name);
                         itemsAdapter.notifyDataSetChanged();
-                        if (todo.getPriority() != null) {
-                            Log.i("Tutorial", "Priority: " + todo.getPriority().toString());
-                        }
 
                         if (todo.getCompletedAt() != null) {
                             Log.i("Tutorial", "CompletedAt: " + todo.getCompletedAt().toString());
@@ -130,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
 
         Todo item = Todo.builder()
                 .name(inputString)
-                .priority(Priority.NORMAL)
                 .build();
         Amplify.DataStore.save(item,
                 success -> Log.i("Tutorial", "Saved item: " + success.item().getName()),
@@ -150,9 +146,6 @@ public class MainActivity extends AppCompatActivity {
     private void updateCompletedText(){
         String completedString = "Completed: " + completed;
         completedText.setText(completedString);
-    }
-    public void queryFirstPage() {
-        query(ModelQuery.list(Todo.class, ModelPagination.limit(1_000)));
     }
 
     private static void query(GraphQLRequest<PaginatedResult<Todo>> request) {

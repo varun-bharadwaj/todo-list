@@ -1,9 +1,9 @@
 {
   "version": 1,
   "serviceConfiguration": {
-    "apiName": "todolist",
+    "apiName": "todoapp",
     "serviceName": "AppSync",
-    "gqlSchemaPath": "/tmp/amplify-7e7d1bbc-3dfa-442f-889c-2b68313d0163/amplify/backend/api/todolist/schema.graphql",
+    "gqlSchemaPath": "/tmp/amplify-1252e531-ec57-4765-b32f-a01297ff71db/amplify/backend/api/todoapp/schema.graphql",
     "defaultAuthType": {
       "mode": "API_KEY",
       "keyDescription": "This is an api key",
