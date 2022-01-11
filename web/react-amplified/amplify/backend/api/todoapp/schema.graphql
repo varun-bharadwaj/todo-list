@@ -1,0 +1,15 @@
+type TodoList {
+  name: String
+  parentName: String
+}
+
+type Todo @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  completed: String
+  due: AWSDateTime
+  tags: [String]
+  parentList: TodoList
+  user: String
+}
+ 
