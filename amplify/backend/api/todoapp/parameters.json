@@ -2,5 +2,11 @@
   "AppSyncApiName": "todoapp",
   "DynamoDBBillingMode": "PAY_PER_REQUEST",
   "DynamoDBEnableServerSideEncryption": false,
-  "AuthModeLastUpdated": "2022-01-05T07:35:15.555Z"
+  "AuthModeLastUpdated": "2022-01-07T03:04:31.243Z",
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authtodoappb4440505",
+      "Outputs.UserPoolId"
+    ]
+  }
 }

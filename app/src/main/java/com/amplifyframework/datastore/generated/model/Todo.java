@@ -30,9 +30,17 @@ public final class Todo implements Model {
   public static final QueryField ID = field("Todo", "id");
   public static final QueryField NAME = field("Todo", "name");
   public static final QueryField COMPLETED = field("Todo", "completed");
+  public static final QueryField DUE = field("Todo", "due");
+  public static final QueryField TAGS = field("Todo", "tags");
+  public static final QueryField PARENT_LIST = field("Todo", "parentList");
+  public static final QueryField USER = field("Todo", "user");
   private final @ModelField(targetType="ID", isRequired = true) String id;
   private final @ModelField(targetType="String", isRequired = true) String name;
   private final @ModelField(targetType="String") String completed;
+  private final @ModelField(targetType="AWSDateTime") Temporal.DateTime due;
+  private final @ModelField(targetType="String") List<String> tags;
+  private final @ModelField(targetType="TodoList") TodoList parentList;
+  private final @ModelField(targetType="String") String user;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime createdAt;
   private @ModelField(targetType="AWSDateTime", isReadOnly = true) Temporal.DateTime updatedAt;
   public String getId() {
@@ -47,6 +55,22 @@ public final class Todo implements Model {
       return completed;
   }
   
+  public Temporal.DateTime getDue() {
+      return due;
+  }
+  
+  public List<String> getTags() {
+      return tags;
+  }
+  
+  public TodoList getParentList() {
+      return parentList;
+  }
+  
+  public String getUser() {
+      return user;
+  }
+  
   public Temporal.DateTime getCreatedAt() {
       return createdAt;
   }
@@ -55,10 +79,14 @@ public final class Todo implements Model {
       return updatedAt;
   }
   
-  private Todo(String id, String name, String completed) {
+  private Todo(String id, String name, String completed, Temporal.DateTime due, List<String> tags, TodoList parentList, String user) {
     this.id = id;
     this.name = name;
     this.completed = completed;
+    this.due = due;
+    this.tags = tags;
+    this.parentList = parentList;
+    this.user = user;
   }
   
   @Override
@@ -72,6 +100,10 @@ public final class Todo implements Model {
       return ObjectsCompat.equals(getId(), todo.getId()) &&
               ObjectsCompat.equals(getName(), todo.getName()) &&
               ObjectsCompat.equals(getCompleted(), todo.getCompleted()) &&
+              ObjectsCompat.equals(getDue(), todo.getDue()) &&
+              ObjectsCompat.equals(getTags(), todo.getTags()) &&
+              ObjectsCompat.equals(getParentList(), todo.getParentList()) &&
+              ObjectsCompat.equals(getUser(), todo.getUser()) &&
               ObjectsCompat.equals(getCreatedAt(), todo.getCreatedAt()) &&
               ObjectsCompat.equals(getUpdatedAt(), todo.getUpdatedAt());
       }
@@ -83,6 +115,10 @@ public final class Todo implements Model {
       .append(getId())
       .append(getName())
       .append(getCompleted())
+      .append(getDue())
+      .append(getTags())
+      .append(getParentList())
+      .append(getUser())
       .append(getCreatedAt())
       .append(getUpdatedAt())
       .toString()
@@ -96,6 +132,10 @@ public final class Todo implements Model {
       .append("id=" + String.valueOf(getId()) + ", ")
       .append("name=" + String.valueOf(getName()) + ", ")
       .append("completed=" + String.valueOf(getCompleted()) + ", ")
+      .append("due=" + String.valueOf(getDue()) + ", ")
+      .append("tags=" + String.valueOf(getTags()) + ", ")
+      .append("parentList=" + String.valueOf(getParentList()) + ", ")
+      .append("user=" + String.valueOf(getUser()) + ", ")
       .append("createdAt=" + String.valueOf(getCreatedAt()) + ", ")
       .append("updatedAt=" + String.valueOf(getUpdatedAt()))
       .append("}")
@@ -118,6 +158,10 @@ public final class Todo implements Model {
     return new Todo(
       id,
       null,
+      null,
+      null,
+      null,
+      null,
       null
     );
   }
@@ -125,7 +169,11 @@ public final class Todo implements Model {
   public CopyOfBuilder copyOfBuilder() {
     return new CopyOfBuilder(id,
       name,
-      completed);
+      completed,
+      due,
+      tags,
+      parentList,
+      user);
   }
   public interface NameStep {
     BuildStep name(String name);
@@ -136,6 +184,10 @@ public final class Todo implements Model {
     Todo build();
     BuildStep id(String id);
     BuildStep completed(String completed);
+    BuildStep due(Temporal.DateTime due);
+    BuildStep tags(List<String> tags);
+    BuildStep parentList(TodoList parentList);
+    BuildStep user(String user);
   }
   
 
@@ -143,6 +195,10 @@ public final class Todo implements Model {
     private String id;
     private String name;
     private String completed;
+    private Temporal.DateTime due;
+    private List<String> tags;
+    private TodoList parentList;
+    private String user;
     @Override
      public Todo build() {
         String id = this.id != null ? this.id : UUID.randomUUID().toString();
@@ -150,7 +206,11 @@ public final class Todo implements Model {
         return new Todo(
           id,
           name,
-          completed);
+          completed,
+          due,
+          tags,
+          parentList,
+          user);
     }
     
     @Override
@@ -166,6 +226,30 @@ public final class Todo implements Model {
         return this;
     }
     
+    @Override
+     public BuildStep due(Temporal.DateTime due) {
+        this.due = due;
+        return this;
+    }
+    
+    @Override
+     public BuildStep tags(List<String> tags) {
+        this.tags = tags;
+        return this;
+    }
+    
+    @Override
+     public BuildStep parentList(TodoList parentList) {
+        this.parentList = parentList;
+        return this;
+    }
+    
+    @Override
+     public BuildStep user(String user) {
+        this.user = user;
+        return this;
+    }
+    
     /** 
      * @param id id
      * @return Current Builder instance, for fluent method chaining
@@ -178,10 +262,14 @@ public final class Todo implements Model {
   
 
   public final class CopyOfBuilder extends Builder {
-    private CopyOfBuilder(String id, String name, String completed) {
+    private CopyOfBuilder(String id, String name, String completed, Temporal.DateTime due, List<String> tags, TodoList parentList, String user) {
       super.id(id);
       super.name(name)
-        .completed(completed);
+        .completed(completed)
+        .due(due)
+        .tags(tags)
+        .parentList(parentList)
+        .user(user);
     }
     
     @Override
@@ -192,6 +280,26 @@ public final class Todo implements Model {
     @Override
      public CopyOfBuilder completed(String completed) {
       return (CopyOfBuilder) super.completed(completed);
+    }
+    
+    @Override
+     public CopyOfBuilder due(Temporal.DateTime due) {
+      return (CopyOfBuilder) super.due(due);
+    }
+    
+    @Override
+     public CopyOfBuilder tags(List<String> tags) {
+      return (CopyOfBuilder) super.tags(tags);
+    }
+    
+    @Override
+     public CopyOfBuilder parentList(TodoList parentList) {
+      return (CopyOfBuilder) super.parentList(parentList);
+    }
+    
+    @Override
+     public CopyOfBuilder user(String user) {
+      return (CopyOfBuilder) super.user(user);
     }
   }
   
