@@ -3,11 +3,12 @@
   "serviceConfiguration": {
     "apiName": "todoapp",
     "serviceName": "AppSync",
-    "gqlSchemaPath": "/tmp/amplify-eb91a29e-d3ab-4c67-ae35-96ad82a93ae7/amplify/backend/api/todoapp/schema.graphql",
+    "gqlSchemaPath": "C:\\Users\\epicv\\OneDrive\\Documents\\College\\Freshman\\Projects\\todo-list\\web\\react-amplified\\amplify\\backend\\api\\todoapp\\schema.graphql",
     "defaultAuthType": {
       "mode": "API_KEY",
-      "keyDescription": "api key description",
-      "expirationTime": 30
+      "expirationTime": 30,
+      "apiKeyExpirationDate": "2022-02-12T03:00:43.764Z",
+      "keyDescription": "api key description"
     },
     "additionalAuthTypes": [
       {
